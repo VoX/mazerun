@@ -1,41 +1,40 @@
 import pygame
 from constants import *
-		
-class Player(pygame.sprite.Sprite):
-	# player controlled thing
-	
-	# set speed vector
+import random
+
+class Enemy(pygame.sprite.Sprite):
+	# base enemy class
+
+	# set speed
 	change_x = 0
 	change_y = 0
-	
-	def __init__(self, x, y):
+
+	def __init__(self):
 		
 		# call parent
-		super(Player, self).__init__()
+		super(Monster, self).__init__()
 		
 		# set height/width
-		self.image = pygame.image.load('dude.png')
+		self.image = pygame.image.load('slime.png')
 		
 		# set location
 		self.rect = self.image.get_rect()
-		self.rect.y = y
-		self.rect.x = x
-
-	@property
-	def ranged_damage(self):
-		return 10
-
-	@property
-	def melee_damage(self):
-		return 15
+		self.health = 30
+		self.counter = 0
 		
 	def change_speed(self, x, y):
-		# change player speed, called with keypress
+		# change enemy speed, called with keypress
 		self.change_x += x
 		self.change_y += y
 		
 	def move(self, walls):
-		# find new player position
+		# find new enemy position
+
+		if self.counter < 60:
+			self.counter += 1
+		else:
+			self.change_x = random.randint(-1,1)
+			self.change_y = random.randint(-1,1)
 		
 		# move left/right
 		self.rect.x += self.change_x
@@ -64,3 +63,11 @@ class Player(pygame.sprite.Sprite):
 			else:
 				# if moving up, do opposite
 				self.rect.top = block.rect.bottom
+
+	def take_damage(self, damage, incoming_x, incoming_y):
+		self.damage = damage
+		self.health -= self.damage
+		self.incoming_x = incoming_x
+		self.incoming_y = incoming_y
+		self.change_x = self.rect.x - self.incoming_x
+		self.change_y = self.rect.y - self.incoming_y

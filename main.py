@@ -12,7 +12,7 @@ def main():
 	
 	# init pygame
 	pygame.init()
-	screen = pygame.display.set_mode([800, 600])
+	screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 	pygame.display.set_caption('ROUGELICK')
 	clock = pygame.time.Clock()
 	
@@ -42,6 +42,19 @@ def main():
 	
 	current_room_num = 0
 	current_room = rooms[current_room_num]
+	for i in xrange(MAX_ENEMY):
+		enemy = Enemy()
+		enemy.rect.x = random.randrange(SCREEN_WIDTH)
+		enemy.rect.y = random.randrange(SCREEN_HEIGHT)
+		roll = random.randint(0,100)
+		if roll > 34:
+			rooms[0].enemy_list.add(enemy)
+		elif roll > 67:
+			rooms[1].enemy_list.add(enemy)
+		else:
+			rooms[2].enemy_list.add(enemy)
+
+	all_sprites.add(current_room.enemy_list)
 		
 	done = False
 	
@@ -125,23 +138,35 @@ def main():
 		# game logic
 		
 		player.move(current_room.wall_list)
-
 		
 		if player.rect.x < -15:
+			# cleanup bullets on room-change
+			# there must be a better way to do this
+			for b in bullet_list:
+				bullet_list.remove(b)
+				all_sprites.remove(b)
+			# room change logic
 			if current_room_num == 0:
 				current_room_num = 2
 				current_room = rooms[current_room_num]
 				player.rect.x = 790
+				
 			elif current_room_num == 2:
+				player.rect.x = 790
 				current_room_num = 1
 				current_room = rooms[current_room_num]
-				player.rect.x = 790
+				
 			else:
 				current_room_num = 0
 				current_room = rooms[current_room_num]
 				player.rect.x = 790
 				
 		if player.rect.x > 801:
+			# cleanup bullets on room-change
+			# there must be a better way to do this
+			for b in bullet_list:
+				bullet_list.remove(b)
+				all_sprites.remove(b)
 			if current_room_num == 0:
 				current_room_num = 1
 				current_room = rooms[current_room_num]
@@ -160,15 +185,41 @@ def main():
 			# collision?
 			b.move()
 			block_hit_list = pygame.sprite.spritecollide(b, current_room.wall_list, False)
+			enemy_hit_list = pygame.sprite.spritecollide(b, current_room.enemy_list, False)
 
 			# remove bullet
 			for block in block_hit_list:
 				bullet_list.remove(b)
 				all_sprites.remove(b)
 
+			for enemy in enemy_hit_list:
+				bullet_list.remove(b)
+				all_sprites.remove(b)
+				# deal damage
+				enemy.take_damage(player.ranged_damage, player.rect.x, player.rect.y)
+				if enemy.health <= 0:
+					current_room.enemy_list.remove(enemy)
+					all_sprites.remove(enemy)
+
 			# remove bullet if off screen
 				
+		for s in sword_list:
+
+			# collision?
+			enemy_hit_list = pygame.sprite.spritecollide(s, current_room.enemy_list, False)
+
+			for enemy in enemy_hit_list:
+				# deal damage
+				enemy.take_damage(player.melee_damage, player.rect.x, player.rect.y)
+				if enemy.health <= 0:
+					current_room.enemy_list.remove(enemy)
+					all_sprites.remove(enemy)
+
+		for m in current_room.enemy_list:
+			m.move(current_room.wall_list)
+
 		# drawing (move to screen.py next)
+
 		screen.fill(BLK)
 		
 		all_sprites.draw(screen)
@@ -178,6 +229,7 @@ def main():
 		except UnboundLocalError:
 			pass
 		current_room.wall_list.draw(screen)
+		current_room.enemy_list.draw(screen)
 		
 		pygame.display.flip()
 		

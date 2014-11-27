@@ -1,6 +1,7 @@
-import pygame
+import pygame, random
 from room import Room
 from wall import Wall
+from enemy import Enemy
 from constants import *
 
 class Room1(Room):
