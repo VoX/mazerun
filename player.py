@@ -1,5 +1,9 @@
 import pygame
 from constants import *
+import random
+from util.perlin import SimplexNoise
+
+perlin = SimplexNoise(period=500)
 		
 class Player(pygame.sprite.Sprite):
 	# player controlled thing
@@ -8,18 +12,25 @@ class Player(pygame.sprite.Sprite):
 	change_x = 0
 	change_y = 0
 	
-	def __init__(self, x, y):
+	def __init__(self, health, x, y):
 		
 		# call parent
 		super(Player, self).__init__()
 		
 		# set height/width
-		self.image = pygame.image.load('dude.png')
+		self.image = pygame.image.load(IMG_DIR + 'new dude.png')
 		
 		# set location
 		self.rect = self.image.get_rect()
 		self.rect.y = y
 		self.rect.x = x
+		self.health = health
+		self.gold = 0
+		self.inventory = []
+
+	@property
+	def hp(self):
+		return self.health
 
 	@property
 	def ranged_damage(self):
@@ -64,3 +75,25 @@ class Player(pygame.sprite.Sprite):
 			else:
 				# if moving up, do opposite
 				self.rect.top = block.rect.bottom
+
+	def take_damage(self, damage, incoming_x, incoming_y):
+		self.damage = damage
+		self.health -= self.damage
+		self.incoming_x = incoming_x
+		self.incoming_y = incoming_y
+		self.counter = 0
+		if (self.rect.x - self.incoming_x) < 0:
+			self.rect.move(self.damage, 0)
+		elif (self.rect.x - self.incoming_x) > 0:
+			self.rect.move(-self.damage, 0)
+		if (self.rect.y - self.incoming_y) < 0:
+			self.rect.move(0,self.damage)
+		elif (self.rect.y - self.incoming_y) > 0:
+			self.rect.move(0, -self.damage)
+
+	def add_loot(self, treasure):
+		if treasure.type == 'coins':
+			count = int(treasure.count)
+			self.gold += count
+		else:
+			self.inventory.append(treasure)

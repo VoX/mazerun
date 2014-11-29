@@ -1,23 +1,26 @@
-import pygame
+import pygame, random, wall
 import wall
 from constants import *
+from gamemap import GameMap
 from room import Room
-from individual_rooms import *
 from player import Player
 from bullet import Bullet
 from sword import Sword
+from screen import Screen
+from enemy import Enemy
+from treasure import Treasure
 
 def main():
 	## MAIN GAME LOOP ##
 	
 	# init pygame
 	pygame.init()
-	screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-	pygame.display.set_caption('ROUGELICK')
 	clock = pygame.time.Clock()
+	screen = Screen()
+	gamemap = GameMap()
 	
 	# create player paddle
-	player = Player(50, 50)
+	player = Player(100, 50, 50)
 	all_sprites = pygame.sprite.Group()
 	moving_sprites = pygame.sprite.Group()
 	bullet_list = pygame.sprite.Group()
@@ -26,19 +29,13 @@ def main():
 
 	all_sprites.add(player)
 	moving_sprites.add(player)
+
+	# sword swing int
+	count = 0
 	
 	# create rooms
 	# there has to be a better way
-	rooms = []
-	
-	room = Room1()
-	rooms.append(room)
-	
-	room = Room2()
-	rooms.append(room)
-	
-	room = Room3()
-	rooms.append(room)
+	rooms = gamemap.get_rooms()
 	
 	current_room_num = 0
 	current_room = rooms[current_room_num]
@@ -51,7 +48,7 @@ def main():
 			rooms[0].enemy_list.add(enemy)
 		elif roll > 67:
 			rooms[1].enemy_list.add(enemy)
-		else:
+		elif roll >= 100:
 			rooms[2].enemy_list.add(enemy)
 
 	all_sprites.add(current_room.enemy_list)
@@ -83,44 +80,48 @@ def main():
 					player.change_speed(0, 5)
 				if weapon_type == 'ranged':
 					if event.key == pygame.K_w:
-						bullet = Bullet('tall',player.rect.centerx,player.rect.centery-10)
+						bullet = Bullet('up',player.rect.centerx,player.rect.centery-10)
 						bullet.fire(0,1)
 						all_sprites.add(bullet)
 						bullet_list.add(bullet)
 					elif event.key == pygame.K_a:
-						bullet = Bullet('long',player.rect.centerx-10,player.rect.centery)
+						bullet = Bullet('left',player.rect.centerx-10,player.rect.centery)
 						bullet.fire(-1,0)
 						all_sprites.add(bullet)
 						bullet_list.add(bullet)
 					elif event.key == pygame.K_s:
-						bullet = Bullet('tall',player.rect.centerx,player.rect.centery)
+						bullet = Bullet('down',player.rect.centerx,player.rect.centery)
 						bullet.fire(0,-1)
 						all_sprites.add(bullet)
 						bullet_list.add(bullet)
 					elif event.key == pygame.K_d:
-						bullet = Bullet('long',player.rect.centerx,player.rect.centery)
+						bullet = Bullet('right',player.rect.centerx,player.rect.centery)
 						bullet.fire(1,0)
 						all_sprites.add(bullet)
 						bullet_list.add(bullet)
 				if weapon_type == 'melee':
 					if event.key == pygame.K_w:
-						sword = Sword('tall',player.rect.centerx,player.rect.centery)
+						sword = Sword('up',player.rect.centerx,player.rect.centery-10)
 						sword.swing(0,1)
+						count = 1
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_a:
-						sword = Sword('long',player.rect.centerx,player.rect.centery)
+						sword = Sword('left',player.rect.centerx-12,player.rect.centery)
 						sword.swing(-1,0)
+						count = 1
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_s:
-						sword = Sword('tall',player.rect.centerx,player.rect.centery)
+						sword = Sword('down',player.rect.centerx,player.rect.centery+6)
 						sword.swing(0,-1)
+						count = 1
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_d:
-						sword = Sword('long',player.rect.centerx,player.rect.centery)
+						sword = Sword('right',player.rect.centerx+6,player.rect.centery)
 						sword.swing(1,0)
+						count = 1
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					
@@ -195,7 +196,7 @@ def main():
 			for enemy in enemy_hit_list:
 				bullet_list.remove(b)
 				all_sprites.remove(b)
-				# deal damage
+				# deal damage to enemy
 				enemy.take_damage(player.ranged_damage, player.rect.x, player.rect.y)
 				if enemy.health <= 0:
 					current_room.enemy_list.remove(enemy)
@@ -209,27 +210,50 @@ def main():
 			enemy_hit_list = pygame.sprite.spritecollide(s, current_room.enemy_list, False)
 
 			for enemy in enemy_hit_list:
-				# deal damage
+				# deal damage to enemy
 				enemy.take_damage(player.melee_damage, player.rect.x, player.rect.y)
 				if enemy.health <= 0:
+					loot_roll = random.randint(0,30)
+					if loot_roll > 15:
+						loot = Treasure(enemy.rect.centerx, enemy.rect.centery)
+						all_sprites.add(loot)
+						current_room.treasure_list.add(loot)
 					current_room.enemy_list.remove(enemy)
 					all_sprites.remove(enemy)
 
 		for m in current_room.enemy_list:
 			m.move(current_room.wall_list)
+			enemy_hit_player = pygame.sprite.spritecollide(player, current_room.enemy_list, False)
+
+			for enemy in enemy_hit_player:
+				# deal damage to player
+				player.take_damage(enemy.damage, enemy.rect.x, enemy.rect.y)
+				if player.health <= 0:
+					pass
+
+		for t in current_room.treasure_list:
+			treasure_picked_up = pygame.sprite.spritecollide(player, current_room.treasure_list, True)
+
+			for treasure in treasure_picked_up:
+				# pick up loot!
+				player.add_loot(treasure)
 
 		# drawing (move to screen.py next)
 
-		screen.fill(BLK)
+		if count > 5:
+			try:
+				all_sprites.remove(sword)
+				sword_list.remove(sword)
+			except UnboundLocalError:
+				pass
+			count = 0
+		if count > 0:
+			count += 1
+		screen.screen.fill(BLK)
 		
-		all_sprites.draw(screen)
-		try:
-			all_sprites.remove(sword)
-			sword_list.remove(sword)
-		except UnboundLocalError:
-			pass
-		current_room.wall_list.draw(screen)
-		current_room.enemy_list.draw(screen)
+		screen.to_screen(all_sprites)
+		screen.to_screen(current_room.wall_list)
+		screen.to_screen(current_room.enemy_list)
 		
 		pygame.display.flip()
 		

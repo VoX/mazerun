@@ -18,12 +18,16 @@ class Enemy(pygame.sprite.Sprite):
 		super(Enemy, self).__init__()
 		
 		# set height/width
-		self.image = pygame.image.load('slime.png')
+		self.image = pygame.image.load(IMG_DIR + 'slime.png')
 		
 		# set location
 		self.rect = self.image.get_rect()
 		self.health = 30
 		self.counter = 30
+
+	@property
+	def damage(self):
+		return 5
 		
 	def change_speed(self, x, y):
 		# change enemy speed, called with keypress
@@ -68,8 +72,8 @@ class Enemy(pygame.sprite.Sprite):
 				self.rect.top = block.rect.bottom
 
 	def take_damage(self, damage, incoming_x, incoming_y):
-		self.damage = damage
-		self.health -= self.damage
+		self.damage_taken = damage
+		self.health -= self.damage_taken
 		self.incoming_x = incoming_x
 		self.incoming_y = incoming_y
 		self.counter = 0

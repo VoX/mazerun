@@ -10,17 +10,20 @@ class Bullet(pygame.sprite.Sprite):
 
 		self.shape = shape
 		self.image = self.get_shape(self.shape)
-		self.image.fill(RED)
 
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
 
 	def get_shape(self, shape):
-		if shape == 'tall':
-			return pygame.Surface([4, 10])
-		if shape == 'long':
-			return pygame.Surface([10, 4])
+		if shape == 'up':
+			return pygame.image.load(IMG_DIR + 'arrah.png')
+		if shape == 'left':
+			return pygame.image.load(IMG_DIR + 'arrah left.png')
+		if shape == 'right':
+			return pygame.image.load(IMG_DIR + 'arrah right.png')
+		if shape == 'down':
+			return pygame.image.load(IMG_DIR + 'arrah down.png')
 
 	def move(self):
 		if self.x_speed > 0:
