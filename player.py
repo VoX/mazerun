@@ -28,9 +28,32 @@ class Player(pygame.sprite.Sprite):
 		self.gold = 0
 		self.inventory = []
 
+		# set stats
+		self.level = 1
+		self.stats = {
+				'Strength': 1,
+				'Attack': 5,
+				'Defense': 5,
+				'Agility': 1,
+				'Intellect': 1,
+				'EXP': 0
+		}
+		self.class_type = {
+				'Warrior': 0,
+				'Archer': 0,
+				'Wizard': 0
+		}
+		self.current_hp = 100
+		#self.main_stat = self.find_main_stat(self.class_type)
+		self.name = 'Rougelicker'
+		self.equipped = {}
+		
+		for treasure in EQUIPMENT_TYPES:
+			self.equipped[treasure] = None
+			
 	@property
-	def hp(self):
-		return self.health
+	def max_hp(self):
+		return (100 + ((self.level-1)*5) + (self.class_type['Warrior']*5))
 
 	@property
 	def ranged_damage(self):
@@ -39,6 +62,40 @@ class Player(pygame.sprite.Sprite):
 	@property
 	def melee_damage(self):
 		return 15
+		
+	@property
+	def max_mp(self):
+		return (0 + (self.class_type['Wizard']*10))
+		
+	@property
+	def defense(self):
+		return (self.stats['Defense'] + self.armor() + self.class_type['Archer'])
+		
+	@property
+	def strength(self):
+		return (self.stats['Strength'] + (self.class_type['Warrior']*2))
+		
+	@property
+	def agility(self):
+		return (self.stats['Agility'] + (self.class_type['Archer']*2))
+		
+	@property
+	def intellect(self):
+		return (self.stats['Intellect'] + (self.class_type['Wizard']*2))
+		
+	@property
+	def EXP(self):
+		return self.stats['EXP']
+		
+	def armor(self):
+		armor = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot]:
+				try:
+					armor += self.equipped[slot].armor
+				except AttributeError:
+					pass
+		return armor
 		
 	def change_speed(self, x, y):
 		# change player speed, called with keypress
@@ -78,7 +135,7 @@ class Player(pygame.sprite.Sprite):
 
 	def take_damage(self, damage, incoming_x, incoming_y):
 		self.damage = damage
-		self.health -= self.damage
+		self.current_hp -= self.damage
 		self.incoming_x = incoming_x
 		self.incoming_y = incoming_y
 		self.counter = 0
@@ -92,7 +149,7 @@ class Player(pygame.sprite.Sprite):
 			self.rect.move(0, -self.damage)
 
 	def add_loot(self, treasure):
-		if treasure.type == 'coins':
+		if treasure.item_type == 'coins':
 			count = int(treasure.count)
 			self.gold += count
 		else:

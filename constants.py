@@ -13,6 +13,14 @@ ROWS = 21
 COLUMNS = 20
 MAX_CHAMBERS = 7
 
+EQUIPMENT_TYPES = ('hat', 'shirt', 'pants', 'shoes', 'back', 'neck', 'hands', 'weapon')
+START_EQUIPMENT = {}
+for treasure in EQUIPMENT_TYPES:
+	START_EQUIPMENT[treasure] = None
+	
+STATS = ('Strength', 'Attack', 'Defense', 'Agility', 'Intellect', 'EXP')
+CLASS = ('Warrior', 'Archer', 'Wizard')
+
 DIRECTIONS = ['north','south','east','west']
 
 TILE_SIZE = 35

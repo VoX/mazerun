@@ -33,6 +33,9 @@ def main():
 	# sword swing int
 	sword_count = 0
 	
+	# invulnerability timer
+	invuln_count = 0
+	
 	# create rooms
 	# there has to be a better way
 	rooms = gamemap.get_rooms()
@@ -92,7 +95,7 @@ def main():
 					if event.key == pygame.K_w:
 						sword = Sword('up',player.rect.centerx,player.rect.centery-10)
 						sword.swing(0,1)
-						sword_count = 1
+						sword_count = 5
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_a:
@@ -216,9 +219,13 @@ def main():
 
 			for enemy in enemy_hit_player:
 				# deal damage to player
-				player.take_damage(enemy.damage, enemy.rect.x, enemy.rect.y)
-				if player.health <= 0:
-					pass
+				if invuln_count == 0:
+					player.take_damage(enemy.damage, enemy.rect.x, enemy.rect.y)
+					invuln_count = 1000
+					if player.health <= 0:
+						pass
+				else:
+					invuln_count -= 1
 
 		for t in current_room.treasure_list:
 			treasure_picked_up = pygame.sprite.spritecollide(player, current_room.treasure_list, True)
@@ -243,6 +250,10 @@ def main():
 		screen.to_screen(all_sprites)
 		screen.to_screen(current_room.wall_list)
 		screen.to_screen(current_room.enemy_list)
+		screen.draw_stats(player)
+		screen.draw_gold(player.gold)
+		screen.draw_inventory()
+		screen.draw_equipment()
 		
 		pygame.display.flip()
 		
