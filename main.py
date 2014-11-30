@@ -31,7 +31,7 @@ def main():
 	moving_sprites.add(player)
 
 	# sword swing int
-	count = 0
+	sword_count = 0
 	
 	# create rooms
 	# there has to be a better way
@@ -39,17 +39,6 @@ def main():
 	
 	current_room_num = 0
 	current_room = rooms[current_room_num]
-	for i in xrange(MAX_ENEMY):
-		enemy = Enemy()
-		enemy.rect.x = random.randrange(SCREEN_WIDTH)
-		enemy.rect.y = random.randrange(SCREEN_HEIGHT)
-		roll = random.randint(0,100)
-		if roll > 34:
-			rooms[0].enemy_list.add(enemy)
-		elif roll > 67:
-			rooms[1].enemy_list.add(enemy)
-		elif roll >= 100:
-			rooms[2].enemy_list.add(enemy)
 
 	all_sprites.add(current_room.enemy_list)
 		
@@ -66,10 +55,10 @@ def main():
 				if event.key == pygame.K_ESCAPE:
 					done = True
 				if event.key == pygame.K_LCTRL:
-						if weapon_type == 'ranged':
-							weapon_type = 'melee'
-						else:
-							weapon_type = 'ranged'
+					if weapon_type == 'ranged':
+						weapon_type = 'melee'
+					else:
+						weapon_type = 'ranged'
 				if event.key == pygame.K_LEFT:
 					player.change_speed(-5, 0)
 				if event.key == pygame.K_RIGHT:
@@ -103,25 +92,25 @@ def main():
 					if event.key == pygame.K_w:
 						sword = Sword('up',player.rect.centerx,player.rect.centery-10)
 						sword.swing(0,1)
-						count = 1
+						sword_count = 1
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_a:
 						sword = Sword('left',player.rect.centerx-12,player.rect.centery)
 						sword.swing(-1,0)
-						count = 1
+						sword_count = 5
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_s:
 						sword = Sword('down',player.rect.centerx,player.rect.centery+6)
 						sword.swing(0,-1)
-						count = 1
+						sword_count = 5
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					elif event.key == pygame.K_d:
 						sword = Sword('right',player.rect.centerx+6,player.rect.centery)
 						sword.swing(1,0)
-						count = 1
+						sword_count = 5
 						all_sprites.add(sword)
 						sword_list.add(sword)
 					
@@ -240,15 +229,15 @@ def main():
 
 		# drawing (move to screen.py next)
 
-		if count > 5:
+		if sword_count == 0:
 			try:
 				all_sprites.remove(sword)
 				sword_list.remove(sword)
 			except UnboundLocalError:
 				pass
-			count = 0
-		if count > 0:
-			count += 1
+			sword_count = 5
+		else:
+			sword_count -= 1
 		screen.screen.fill(BLK)
 		
 		screen.to_screen(all_sprites)

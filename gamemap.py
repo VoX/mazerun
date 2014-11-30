@@ -8,12 +8,12 @@ class GameMap(object):
 	def get_rooms(self):
 		rooms = []
 	
-		room = Room1()
+		room = Room()
 		rooms.append(room)
 	
-		room = Room2()
+		room = Room()
 		rooms.append(room)
 	
-		room = Room3()
+		room = Room()
 		rooms.append(room)
 		return rooms

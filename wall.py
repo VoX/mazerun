@@ -3,16 +3,16 @@ import pygame
 class Wall(pygame.sprite.Sprite):
 	# WALL
 	
-	def __init__(self, x, y, width, height, color):
+	def __init__(self, left, top):
 	
 		# call parent
 		super(Wall, self).__init__()
 		
 		# make blue wall
-		self.image = pygame.Surface([width, height])
-		self.image.fill(color)
+		self.image = pygame.Surface((35, 35))
+		self.image.fill((255,255,255))
 		
 		# set location
 		self.rect = self.image.get_rect()
-		self.rect.y = y
-		self.rect.x = x
+		self.rect.top = top
+		self.rect.left = left
