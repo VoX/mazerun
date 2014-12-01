@@ -21,21 +21,28 @@ class Treasure(pygame.sprite.Sprite):
 		choice = random.randint(0,100)
 		if choice < 20:
 			self.item_type = 'coins'
-			self.image = pygame.image.load(IMG_DIR + 'gold.png')
-			self.count = self.get_count()
+			x = random.randint(1,30)
+			self.count = x
+			self.image = self.coin_image(self.count)			
 		elif choice < 40:
 			self.item_type = 'weapon'
+			self.title = 'greatsword'
 			self.image = pygame.image.load(IMG_DIR + 'swadia.png')
 		elif choice < 60:
-			self.item_type = 'armor'
+			self.item_type = 'shirt'
+			self.title = 'iron helm'
 			self.image = pygame.image.load(IMG_DIR + 'helm.png')
 		elif choice < 80:
-			self.item_type = 'accessory'
+			self.item_type = 'hat'
+			self.title = 'fool\'s crown'
 			self.image = pygame.image.load(IMG_DIR + 'crown.png')
 		elif choice <= 100:
-			self.item_type = 'magic'
+			self.item_type = 'weapon'
+			self.title = 'apprentice wand'
 			self.image = pygame.image.load(IMG_DIR + 'wand.png')
 
-	def get_count(self):
-		x = random.randint(1,30)
-		return x
+	def coin_image(self, c):
+		if c > 15:
+			return pygame.image.load(IMG_DIR + 'gold_tiny.png')
+		elif c < 50:
+			return pygame.image.load(IMG_DIR + 'gold_small.png')

@@ -56,16 +56,16 @@ class Player(pygame.sprite.Sprite):
 		return (100 + ((self.level-1)*5) + (self.class_type['Warrior']*5))
 
 	@property
+	def max_mp(self):
+		return (0 + (self.class_type['Wizard']*10))
+
+	@property
 	def ranged_damage(self):
-		return 10
+		return (7+(self.agility*2))
 
 	@property
 	def melee_damage(self):
-		return 15
-		
-	@property
-	def max_mp(self):
-		return (0 + (self.class_type['Wizard']*10))
+		return (10+(self.strength*3))
 		
 	@property
 	def defense(self):
@@ -96,6 +96,12 @@ class Player(pygame.sprite.Sprite):
 				except AttributeError:
 					pass
 		return armor
+
+	def earn_EXP(self, EXP):
+		self.stats['EXP'] += EXP
+
+	def equip_item(self, item):
+		self.equipped[item.item_type] = item
 		
 	def change_speed(self, x, y):
 		# change player speed, called with keypress
@@ -147,10 +153,3 @@ class Player(pygame.sprite.Sprite):
 			self.rect.move(0,self.damage)
 		elif (self.rect.y - self.incoming_y) > 0:
 			self.rect.move(0, -self.damage)
-
-	def add_loot(self, treasure):
-		if treasure.item_type == 'coins':
-			count = int(treasure.count)
-			self.gold += count
-		else:
-			self.inventory.append(treasure)

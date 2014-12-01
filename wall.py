@@ -1,4 +1,5 @@
 import pygame
+from constants import *
 
 class Wall(pygame.sprite.Sprite):
 	# WALL
@@ -9,8 +10,8 @@ class Wall(pygame.sprite.Sprite):
 		super(Wall, self).__init__()
 		
 		# make blue wall
-		self.image = pygame.Surface((35, 35))
-		self.image.fill((255,255,255))
+		self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
+		self.image.fill((BRN))
 		
 		# set location
 		self.rect = self.image.get_rect()

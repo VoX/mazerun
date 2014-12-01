@@ -28,6 +28,10 @@ class Enemy(pygame.sprite.Sprite):
 	@property
 	def damage(self):
 		return 5
+
+	@property
+	def EXP(self):
+		return 25
 		
 	def change_speed(self, x, y):
 		# change enemy speed, called with keypress

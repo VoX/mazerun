@@ -13,7 +13,10 @@ class Inventory(object):
 		
 	def add_to_inventory(self, item, player):
 		# adds item to inventory
-		if item.item_type = 'trash' or item.item_type = 'coins':
+		if item.item_type == 'trash':
+			return
+		elif item.item_type == 'coins':
+			player.gold += item.count
 			return
 		if player.equipped[item.item_type]:
 			try:

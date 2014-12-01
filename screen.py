@@ -19,6 +19,18 @@ class Screen(object):
 
 	def to_screen(self, to_draw):
 		to_draw.draw(self.screen)
+
+	def draw_alert(self, alert, color=WHT):
+		# draws alert box
+		self.alert = self.font.render('xxx', True, BLK, BLK)
+		self.screen.blit(self.alert, (0, 790))
+		try:
+			pygame.display.flip()
+		except:
+			pass
+		self.alert = self.font.render(alert, True, color, BLK)
+		self.screen.blit(self.alert, (0, 790))
+		pygame.display.flip()
 		
 	def draw_stats(self, player_stats, color=WHT):
 		# renders player stats
@@ -27,21 +39,22 @@ class Screen(object):
 		self.screen.blit(self.stats_screen, (750, 0))
 		self.stats_screen = self.small_font.render('Level: {}'.format(player_stats.level), True, color, BLK)
 		self.screen.blit(self.stats_screen, (750, 15))
-		self.stats_screen = self.small_font.render('HP: {}/{}'.format((player_stats.current_hp), (player_stats.max_hp)), True, color, BLK)
+		self.stats_screen = self.small_font.render('EXP: {}'.format(player_stats.EXP), True, color, BLK)
 		self.screen.blit(self.stats_screen, (750, 30))
-		line = 45
+		self.stats_screen = self.small_font.render('HP: {}/{}'.format((player_stats.current_hp), (player_stats.max_hp)), True, color, BLK)
+		self.screen.blit(self.stats_screen, (750, 45))
+		line = 60
 		for stat in STATS:
 			if hasattr(player_stats, stat):
 				s = str(getattr(player_stats, stat))
 			else:
 				s = str(player_stats.stats[stat])
 				
-		self.stats_screen = self.small_font.render('{}: {}'.format(stat, s), True, color, BLK)
-		self.screen.blit(self.stats_screen, (750, line))
-		line += 15
+				self.stats_screen = self.small_font.render('{}: {}'.format(stat, s), True, color, BLK)
+				self.screen.blit(self.stats_screen, (750, line))
+				line += 15
 		self.stats_screen = self.small_font.render('Armor: {}'.format(player_stats.armor()), True, color, BLK)
 		self.screen.blit(self.stats_screen, (750, line))
-		line += 15
 		
 	def draw_gold(self, gold_count):
 		# renders gold
