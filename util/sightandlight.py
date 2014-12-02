@@ -111,8 +111,8 @@ class SightAndLight():
 		# RAY in parametric: point + direction*T1
 		r_px = ray['a']['x']
 		r_py = ray['a']['y']
-		r_dx = ray['b']['x'] - segment['a']['x']
-		r_dy = ray['b']['y'] - segment['a']['y']
+		r_dx = ray['b']['x'] - ray['a']['x']
+		r_dy = ray['b']['y'] - ray['a']['y']
 
 		# SEGMENT in parametric: point + direction*T2
 		s_px = segment['a']['x']
