@@ -43,7 +43,11 @@ class Screen(object):
 		self.screen.blit(self.stats_screen, (750, 30))
 		self.stats_screen = self.small_font.render('HP: {}/{}'.format((player_stats.current_hp), (player_stats.max_hp)), True, color, BLK)
 		self.screen.blit(self.stats_screen, (750, 45))
-		line = 60
+		self.stats_screen = self.small_font.render('M. Damage: {}'.format(player_stats.melee_damage()), True, color, BLK)
+		self.screen.blit(self.stats_screen, (750, 60))
+		self.stats_screen = self.small_font.render('R. Damage: {}'.format(player_stats.ranged_damage()), True, color, BLK)
+		self.screen.blit(self.stats_screen, (750, 75))
+		line = 90
 		for stat in STATS:
 			if hasattr(player_stats, stat):
 				s = str(getattr(player_stats, stat))

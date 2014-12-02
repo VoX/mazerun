@@ -1,7 +1,7 @@
-import pygame
-from constants import *
-import random
+import pygame, random
 from util.perlin import SimplexNoise
+from constants import *
+from treasure import Treasure
 
 perlin = SimplexNoise(period=500)
 		
@@ -27,29 +27,34 @@ class Player(pygame.sprite.Sprite):
 		self.health = health
 		self.gold = 0
 		self.inventory = []
+		self.equipped = {}
+
+		for treasure in EQUIPMENT_TYPES:
+			self.equipped[treasure] = None
 
 		# set stats
 		self.level = 1
-		self.stats = {
-				'Strength': 1,
-				'Attack': 5,
-				'Defense': 5,
-				'Agility': 1,
-				'Intellect': 1,
-				'EXP': 0
-		}
 		self.class_type = {
 				'Warrior': 0,
 				'Archer': 0,
 				'Wizard': 0
 		}
+		self.stats = {
+				'M. Damage': self.melee_damage,
+				'R. Damage': self.ranged_damage(),
+				'Strength': self.strength,
+				'Agility': self.agility,
+				'Intellect': self.intellect,
+				'EXP': 0
+		}
+		
 		self.current_hp = 100
 		#self.main_stat = self.find_main_stat(self.class_type)
 		self.name = 'Rougelicker'
-		self.equipped = {}
 		
-		for treasure in EQUIPMENT_TYPES:
-			self.equipped[treasure] = None
+		### FIX THIS, need to separate loot (location on the map) and
+		### Treasure (the item itself)
+		#self.equipped['m. weapon'] = 
 			
 	@property
 	def max_hp(self):
@@ -58,34 +63,68 @@ class Player(pygame.sprite.Sprite):
 	@property
 	def max_mp(self):
 		return (0 + (self.class_type['Wizard']*10))
-
-	@property
-	def ranged_damage(self):
-		return (7+(self.agility*2))
-
-	@property
-	def melee_damage(self):
-		return (10+(self.strength*3))
 		
-	@property
-	def defense(self):
-		return (self.stats['Defense'] + self.armor() + self.class_type['Archer'])
+	#@property
+	#def defense(self):
+	#	return (5 + self.armor() + self.class_type['Archer'])
 		
 	@property
 	def strength(self):
-		return (self.stats['Strength'] + (self.class_type['Warrior']*2))
+		stren = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot] != None:
+				stren += self.equipped[slot].str_buff
+
+		return (1 + stren + (self.class_type['Warrior']*2))
 		
 	@property
 	def agility(self):
-		return (self.stats['Agility'] + (self.class_type['Archer']*2))
+		agi = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot] != None:
+				agi += self.equipped[slot].agi_buff
+
+		return (1 + agi + (self.class_type['Archer']*2))
 		
 	@property
 	def intellect(self):
-		return (self.stats['Intellect'] + (self.class_type['Wizard']*2))
+		intel = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot] != None:
+				stren += self.equipped[slot].aint_buff
+
+		return (1 + intel + (self.class_type['Wizard']*3))
 		
 	@property
 	def EXP(self):
 		return self.stats['EXP']
+
+	def ranged_damage(self):
+		r_dam = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot]:
+				try:
+					r_dam += self.equipped[slot].r_damage
+				except AttributeError:
+					pass
+
+		r_dam += (3+(self.agility*2))
+					
+		return r_dam
+
+
+	def melee_damage(self):
+		m_dam = 0
+		for slot in self.equipped.keys():
+			if self.equipped[slot]:
+				try:
+					m_dam += self.equipped[slot].m_damage
+				except AttributeError:
+					pass 
+		
+		m_dam += (5+(self.strength*2))
+
+		return m_dam
 		
 	def armor(self):
 		armor = 0

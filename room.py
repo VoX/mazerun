@@ -66,7 +66,7 @@ class Room(object):
 		chambers = 1
 		keep_going = 50
 		while chambers <= MAX_CHAMBERS and keep_going:
-			height = randint(4,10)
+			height = randint(4, 10)
 			length = randint(4, 10)
 			x = randint(0, COLUMNS-1)
 			y = randint(0, ROWS)

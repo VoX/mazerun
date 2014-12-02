@@ -10,6 +10,7 @@ from sword import Sword
 from screen import Screen
 from enemy import Enemy
 from treasure import Treasure
+from sightandlight import SightAndLight
 from expreward import EXPReward
 
 class Game(object):
@@ -49,6 +50,9 @@ class Game(object):
 		
 		self.current_room_num = 0
 		self.current_room = self.rooms[self.current_room_num]
+
+		#self.darkness = SightAndLight((self.player.rect.centerx,self.player.rect.centery),
+		#	self.current_room.wall_list)
 
 		self.all_sprites.add(self.current_room.enemy_list)
 		
@@ -213,7 +217,7 @@ class Game(object):
 					self.bullet_list.remove(b)
 					self.all_sprites.remove(b)
 					# deal damage to enemy
-					enemy.take_damage(self.player.ranged_damage,
+					enemy.take_damage(self.player.ranged_damage(),
 							self.player.rect.x, self.player.rect.y)
 					if enemy.health <= 0:
 						self.current_room.enemy_list.remove(enemy)
@@ -240,7 +244,7 @@ class Game(object):
 				for enemy in enemy_hit_list:
 					# deal damage to enemy
 					if self.sword_count == 5:
-						enemy.take_damage(self.player.melee_damage,
+						enemy.take_damage(self.player.melee_damage(),
 									self.player.rect.x, self.player.rect.y)
 					if enemy.health <= 0:
 						self.current_room.enemy_list.remove(enemy)
@@ -301,6 +305,8 @@ class Game(object):
 			self.screen.to_screen(self.current_room.wall_list)
 			self.screen.to_screen(self.current_room.enemy_list)
 			self.screen.to_screen(self.reward_list)
+			#self.darkness.update()
+			#self.darkness.render_frame()
 			self.screen.draw_stats(self.player)
 			self.screen.draw_gold(self.player.gold)
 			self.screen.draw_inventory(self.inventory)
@@ -314,6 +320,15 @@ class Game(object):
 		text = 'You found %s. %s' % (treasure.title, treasure.desc)
 		self.inventory.add_to_inventory(treasure, self.player)
 		self.screen.draw_alert(text)
+
+	def blit_alpha(self, target, source, location, opacity):
+		x = location[0]
+		y = location[1]
+		temp = pygame.Surface((source.get_width(), source.get_height())).convert()
+		temp.blit(target, (-x, -y))
+		temp.blit(source, (0, 0))
+		temp.set_alpha(opacity)        
+		target.blit(temp, location)
 	
 if __name__ == "__main__":
 	main()
