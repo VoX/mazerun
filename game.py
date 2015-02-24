@@ -55,7 +55,7 @@ class Game(object):
 		sys.exit()
 
 	def run(self):
-	
+		self.screen.to_screen(self.current_room.wall_list, self.screen.mapSurf)
 		while 1:			
 			self.clock.tick(60)
 			# event processing
@@ -200,11 +200,11 @@ class Game(object):
 	def viewerUpdate(self, screen):
 		# updates visual elements
 		screen.screen.fill(BLK)
-		screen.mapSurf.fill(screen.bgcolor);
+		
 		screen.spriteSurf.fill(screen.bgcolor);
 		screen.GUISurf.fill(screen.bgcolor);
 		
-		screen.to_screen(self.current_room.wall_list, screen.mapSurf)
+	
 		screen.to_screen(self.current_room.enemy_list, screen.spriteSurf)
 		screen.to_screen(self.current_room.treasure_list, screen.spriteSurf)
 		screen.to_screen(self.expReward_list, screen.spriteSurf)
@@ -215,10 +215,12 @@ class Game(object):
 		screen.draw_gold(self.player.gold)
 		screen.draw_inventory(self.inventory)
 		screen.draw_equipment(self.player.equipped)
+
 		
 		screen.update()
 			
 		pygame.display.flip()
+
 	
 	def weaponSelect(self):
 		# allows swapping between weapons

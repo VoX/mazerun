@@ -5,14 +5,11 @@ from pygame.locals import *
 class Screen(object):
 
 	def __init__(self):
-		self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], 32, 32)
-		self.mapSurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-		self.GUISurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-		self.spriteSurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-		self.bgcolor = Color("pink");
-		self.mapSurf.set_colorkey(self.bgcolor);
-		self.GUISurf.set_colorkey(self.bgcolor);
-		self.spriteSurf.set_colorkey(self.bgcolor);
+		self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT], pygame.NOFRAME+pygame.DOUBLEBUF, 32)
+		self.mapSurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT),pygame.HWSURFACE + pygame.SRCALPHA)
+		self.GUISurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT),pygame.HWSURFACE + pygame.SRCALPHA)
+		self.spriteSurf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT),pygame.HWSURFACE + pygame.SRCALPHA)
+		self.bgcolor = Color(0,0,0,0);
 		
 		pygame.display.set_caption('ROUGELICK')
 		self.font = pygame.font.SysFont(None, 48)
@@ -107,6 +104,5 @@ class Screen(object):
 			
 	def update(self):
 		self.screen.blit(self.mapSurf, (0,0))
-
 		self.screen.blit(self.GUISurf, (0,0))
 		self.screen.blit(self.spriteSurf, (0,0))
